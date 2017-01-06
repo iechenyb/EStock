@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"   
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:context="http://www.springframework.org/schema/context"   
+    xmlns:aop="http://www.springframework.org/schema/aop"   
+    xmlns:tx="http://www.springframework.org/schema/tx"   
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd   
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd   
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd   
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">  
+  
+    <description>springJTA</description>  
+    <!-- Spring3+后不再对JTOM提供支持,所以可以改用Atomikos管理多数据源事务 -->
+    <!-- JOTM实例 -->  
+    <bean id="jotm" class="org.springframework.transaction.jta.JotmFactoryBean">  
+          <property name="defaultTimeout" value="500000"/>  
+    </bean>  
+  
+    <!-- JTA事务管理器 -->  
+    <bean id="jtaTransactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">     
+        <property name="userTransaction" ref="jotm" />     
+    </bean>  
+  
+    <!-- 数据源A -->   
+    <bean id="dataSourceA" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">   
+       <property name="dataSource">   
+           <bean class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">   
+               <property name="transactionManager" ref="jotm"/>   
+               <property name="driverName" value="${jdbc.driver}"/>   
+               <property name="url" value="${jdbc.url}"/>   
+           </bean>   
+       </property>   
+       <property name="user" value="${jdbc.username}"/>   
+       <property name="password" value="${jdbc.password}"/>   
+    </bean>   
+  
+    <!-- 数据源B -->   
+    <bean id="dataSourceB" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">   
+       <property name="dataSource">   
+           <bean class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">   
+               <property name="transactionManager" ref="jotm"/>   
+               <property name="driverName" value="${jdbc2.driver}"/>   
+               <property name="url" value="${jdbc2.url}"/>   
+           </bean>   
+       </property>   
+       <property name="user" value="${jdbc2.username}"/>   
+       <property name="password" value="${jdbc2.password}"/>   
+    </bean>   
+  
+    <bean id = "jdbcTemplateA"   
+         class = "org.springframework.jdbc.core.JdbcTemplate">   
+         <property name = "dataSource" ref="dataSourceA"/>   
+    </bean>  
+      
+    <bean id = "jdbcTemplateB"   
+         class = "org.springframework.jdbc.core.JdbcTemplate">   
+         <property name = "dataSource" ref="dataSourceB"/>   
+    </bean>      
+  
+    <!-- 事务切面配置 -->   
+    <aop:config>   
+        <aop:pointcut id="pointCut"  
+                expression="execution(* com.logcd.service..*.*(..))"/><!-- 包及其子包下的所有方法 -->  
+        <aop:advisor pointcut-ref="pointCut" advice-ref="txAdvice"/>   
+          
+        <aop:advisor pointcut="execution(* *..common.service..*.*(..))" advice-ref="txAdvice"/>  
+    </aop:config>   
+  
+    <!-- 通知配置 -->   
+    <tx:advice id="txAdvice" transaction-manager="jtaTransactionManager">   
+       <tx:attributes>   
+          <tx:method name="delete*" rollback-for="Exception"/>   
+          <tx:method name="save*" rollback-for="Exception"/>   
+          <tx:method name="update*" rollback-for="Exception"/>   
+          <tx:method name="find*" read-only="true" rollback-for="Exception"/>   
+       </tx:attributes>   
+    </tx:advice>   
+  
+    <bean id="genericDao"  class="com.logcd.dao.impl.GenericDaoImpl" autowire="byName"> </bean>  
+    <bean id="userService"  class="com.logcd.service.impl.UserServiceImpl" autowire="byName"> </bean>  
+</beans>

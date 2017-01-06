@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	   		http://www.springframework.org/schema/context
+	   		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+			http://www.springframework.org/schema/mvc
+			http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
+			http://www.springframework.org/schema/task
+			http://www.springframework.org/schema/task/spring-task-3.1.xsd
+			http://www.springframework.org/schema/aop
+			http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+			">
+<!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"  destroy-method="close">       
+    <property name="driverClassName" value="${h2.driverClassName}" />      
+    <property name="url" value="${h2.url}" /> 
+    <property name="username" value="${h2.username}" />      
+    <property name="password" value="${h2.password}" />      
+</bean> aop控制事务 -->
+ <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+      <!-- 基本属性 url、user、password -->
+      <property name="driverClassName" value="${h2.driverClassName}" />      
+      <property name="url" value="${h2.url}" />
+      <property name="username" value="${h2.username}" />
+      <property name="password" value="${h2.password}" />
+      <!-- 初始化时建立物理连接的个数。初始化发生在显示调用init方法，或者第一次getConnection时-->
+      <property name="initialSize" value="5" />
+      <property name="minIdle" value="2" /> 
+      <property name="maxActive" value="20" />
+      <!-- 配置获取连接等待超时的时间 -->
+      <property name="maxWait" value="6000000" />
+      <!-- 
+	  	有两个含义：
+		1) Destroy线程会检测连接的间隔时间
+	 	2) testWhileIdle的判断依据，详细看testWhileIdle属性的说明    
+	         配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+      <property name="timeBetweenEvictionRunsMillis" value="60000" />
+      <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+      <property name="minEvictableIdleTimeMillis" value="300000" />
+      <property name="validationQuery" value="select 1 from dual" />
+     <!--  建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于
+			timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。 -->
+      <property name="testWhileIdle" value="true" />
+      <!-- 申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。 -->
+      <property name="testOnBorrow" value="false" />
+      <!-- 归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能 -->
+      <property name="testOnReturn" value="false" />
+      <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+      <property name="poolPreparedStatements" value="true" />
+      <property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
+     <!--  要启用PSCache，必须配置大于0，当大于0时，poolPreparedStatements自动触发修改为true。
+		在Druid中，不会存在Oracle下PSCache占用内存过多的问题，可以把这个数值配置大一些，比如说100 -->
+      <property name="maxOpenPreparedStatements" value="100" />
+      <!-- 配置监控统计拦截的filters -->
+      <property name="filters" value="stat" />
+      <!-- <property name="validationQuery" value="select 1 from dual" /> -->
+      <!--连接泄漏处理。Druid提供了RemoveAbandanded相关配置，用来关闭长时间不使用的连接。-->
+	  <property name="removeAbandoned" value="true"/> <!-- 打开removeAbandoned功能 -->	
+	  <property name="removeAbandonedTimeout" value="1800"/> <!-- 1800秒，也就是30分钟 -->
+	  <property name="logAbandoned" value="true"/> <!-- 关闭abanded连接时输出错误日志 -->
+</bean>
+
+ <bean id="sessionFactory" name="sessionFactory"
+        class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"> 
+        <property name="dataSource"> 
+            <ref bean="dataSource" /> 
+        </property> 
+         <!-- <property name="configLocations"> 
+            <value> classpath:hibernate.cfg.xml</value> 
+           <value> classpath:ehcache.xml</value>
+         </property>  
+          <property name="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</property>
+         -->
+        <!-- <property name="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</property> -->
+        <property name="hibernateProperties"> 
+            <props> 
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop> 
+                <prop key="hibernate.show_sql">true</prop> 
+                <prop key="hibernate.connection.autocommit">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop> 
+				<!-- 配置二级缓存的相应的类 -->
+				<!-- <prop key=" hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>  -->
+				<!-- 配置二级缓存 -->
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.cache.use_query_cache">false</prop>	
+				<!-- 由于查询的缓存命中率很低，所以我们关掉查询时的二级缓存 -->
+				<prop key="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</prop>	
+				<!-- 指定使用OSCache这个实现-->  
+       			<!-- <prop name="cache.provider_class">org.hibernate.cache.OSCacheProvider</pro>   -->
+        		<!-- 打开统计信息-->  
+        		<!-- <pro name="generate_statistics">true</pro>    -->
+				<!-- 由于spring也使用了Ehcache, 保证双方都使用同一个缓存管理器 -->
+				<!-- <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</prop> -->
+				<!-- <class-cache class="com.cyb.qutoes.vo.User" usage="read-only"/> -->
+			</props> 
+        </property> 
+		<!-- 使用 mappingDirectoryLocations 属性可以指定某目录下的 hbm 文件（“classpath*:”指向 WEB-INF/classes 目录） -->
+            <property name="mappingDirectoryLocations">
+            <list>
+                <value>
+                    /com/cyb/qutoes/vo/*.java 
+                    /com/cyb/xtqx/bean/*.java      
+                </value>
+            </list>
+        </property>
+
+<!-- 补充：使用 mappingResources 属性要一个一个写 hbm 文件（“classpath*:”指向 WEB-INF/classes 目录） -->
+     <property name="mappingResources">
+         <list>
+            <!-- <value>classpath:com/cyb/hbm/*.hbm.xml</value> -->
+            <value>/com/cyb/hbm/stock.hbm.xml</value> 
+            <value>/com/cyb/hbm/idea.hbm.xml</value> 
+            <value>/com/cyb/hbm/user.hbm.xml</value> 
+        </list>
+    </property>
+   <!--指明使用标注的实体类-->
+     <property name="annotatedClasses">
+     <list>
+       <value>com.cyb.qutoes.vo.annotaion.bean.Ticket</value>
+     </list>
+   </property>  
+ 
+   <!--当然也可以不使用上面这种指定的方式，而使用包扫描的方式做为替换，推荐这种-->
+   <property name="packagesToScan">
+       <list>
+            <value>com.cyb.qutoes.vo.annotaion.bean</value>
+             <value>com.cyb.xtqx.bean</value>
+        </list>
+    </property>
+     <!-- 引入外部配置文件，将jbpm和CRM的配置信息放到一起 -->  
+    <!-- <property name="configLocation" value="classpath:jbpm.hibernate.cfg.xml"></property> -->  
+  </bean>
+  <!-- cacheManager, 指定ehcache.xml的位置 --><!-- 由于hibernate也使用了Ehcache, 保证双方都使用同一个缓存管理器 -->
+   <bean id="cacheManagerEhcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation">
+            <value>classpath:ehcache.xml</value>
+        </property>
+        
+        <property name="shared" value="true"/>
+    </bean>
+ <!-- 配置事务管理器 -->
+<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+   <property name="sessionFactory">
+       <ref bean="sessionFactory"/>
+   </property>
+   <property name="dataSource" ref="dataSource" />  
+</bean>
+  
+<aop:aspectj-autoproxy proxy-target-class="true" /> 
+<!-- 事务配置必备 -->  
+<!-- <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>  -->
+<tx:advice id="txAdvice" transaction-manager="transactionManager">
+	    <tx:attributes>
+	      <tx:method name="test*" propagation="REQUIRED"/>
+	      <tx:method name="add*" propagation="REQUIRED"/>
+	      <tx:method name="save*" propagation="REQUIRED"/>
+	      <tx:method name="del*" propagation="REQUIRED"/>
+	      <tx:method name="update*" propagation="REQUIRED"/>
+	      <tx:method name="add*" propagation="REQUIRED"/>
+	      <tx:method name="find*" propagation="REQUIRED"/>
+	      <tx:method name="get*" propagation="REQUIRED"/>
+	      <tx:method name="apply*" propagation="REQUIRED"/>
+	    </tx:attributes>
+	</tx:advice>  
+
+	<aop:config>
+		 <aop:pointcut id="allTestServiceMethod" expression="execution(* com.cyb.service..*.*(..))"/>
+		 <aop:advisor pointcut-ref="allTestServiceMethod" advice-ref="txAdvice" /> 		 
+		 <aop:advisor pointcut="execution(* com.cyb.dao..*.*(..))" advice-ref="txAdvice" />  
+	</aop:config> 
+<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+     <property name="dataSource">
+         <ref bean="dataSource" />
+     </property>
+</bean>
+	<!-- <bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+	    <property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>  -->
+</beans>

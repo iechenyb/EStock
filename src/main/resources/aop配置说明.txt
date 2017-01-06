@@ -1,0 +1,69 @@
+
+
+<tx:advice id="txAdvice" transaction-manager="transactionManager">  
+    <tx:attributes>  
+        <tx:method name="bulk*" propagation="REQUIRED" isolation="DEFAULT" />  
+        <tx:method name="load*" propagation="REQUIRED" isolation="DEFAULT" read-only="true"/>  
+    </tx:attributes>  
+</tx:advice>  
+
+<aop:config>  
+        <aop:advisor pointcut="execution(* *..*Service*.*(..))" advice-ref="txAdvice" />  
+</aop:config>  
+  
+或  
+  
+<aop:config>  
+    <aop:pointcut id="allServiceMethods"  
+                  expression="execution(* com.apress.prospring2.ch16.services.*.*(..))"/>  
+    <aop:advisor advice-ref="defaultTransactionAdvice"  
+                 pointcut-ref="allServiceMethods"/>  
+</aop:config>  
+  
+<tx:advice id="defaultTransactionAdvice" transaction-manager="transactionManager">  
+    <tx:attributes>  
+        <tx:method  
+                name="*"  
+                isolation="DEFAULT"  
+                propagation="REQUIRED"  
+                no-rollback-for="java.lang.RuntimeException"  
+                timeout="100"/>  
+        <tx:method  
+                name="get*"  
+                read-only="true"/>  
+    </tx:attributes>  
+</tx:advice> 
+
+<aop:config>
+		 <aop:pointcut id="allTestServiceMethod" expression="execution(* com.cyb.service.*.*(..))"/>
+		 <aop:advisor pointcut-ref="allTestServiceMethod" advice-ref="txAdvice" /> 
+		 
+		 <aop:advisor pointcut="execution(* com.cyb.dao.*.*(..))" advice-ref="txAdvice" />  
+</aop:config> 
+
+<bean id="assistant" class="Assistant" />
+17     <aop:config>
+18       <aop:aspect ref="assistant">
+19       <aop:pointcut id="ass" expression="execution(* driver(..))"/>
+20       <aop:before pointcut-ref="ass" method="BeforeDepart"/>
+21       <aop:after pointcut-ref="ass" method="AfterBack"/>
+22       </aop:aspect>
+23</aop:config>
+<aop:config> 
+<aop:pointcut id="allServiceMethod" expression="(execution (* com.cms.sys.service.*.*(..)))or (execution (* com.cms.art.service.*.*(..)))" />
+<aop:advisor advice-ref="txAdvice" pointcut-ref="allServiceMethod" /> 
+</aop:config> 
+匹配所有方法
+[html] view plain copy
+execution(* *(..))  
+[html] view plain copy
+任意公共方法的执行：  
+execution(public * *(..))
+任何一个以“set”开始的方法的执行：
+execution(* set*(..))
+UserService 接口的任意方法的执行：
+execution(* com.service.UserService.*(..))
+定义在service包里的任意方法的执行：
+execution(* com.service.*.*(..))
+定义在service包或者子包里的任意方法的执行：
+execution(* com.service..*.*(..))

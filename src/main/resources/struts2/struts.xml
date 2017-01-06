@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+    <!-- struts.objectFactory.spring.autoWire = typeName -->
+    <constant name="struts.action.extension" value="do,action"></constant>
+    <constant name="struts.objectFactory" value="spring"></constant>
+	<!-- Struts 2 的Action必须放在包空间下 -->
+	<include file="struts-default.xml"></include>
+	<include file="struts-plugin.xml"></include>
+	<package name="strutsqs" namespace="/" extends="struts-default">
+	      
+		<!-- 定义action的名字以及action的实现类 -->
+		<action name="LoginAciton" class="com.cyb.struts.controller.LoginAction12">
+			<!-- 定义action的处理结果result,result有两个属性，其中name指定返回名称，tyle指定返回的类型 -->
+			<!-- 处理Login错误时返回/error.jsp -->
+                        <result name="error">/struts/error.jsp</result>
+			<!-- 处理Lognin正确时/suc.jsp -->
+            		<result name="suc">/struts/suc.jsp</result>
+		</action>
+		<!--  <include file="struts-department.xml"></include>
+		 <include file="struts-employee.xml"></include> -->
+	</package>	
+</struts> 

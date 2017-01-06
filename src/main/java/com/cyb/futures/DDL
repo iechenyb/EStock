@@ -1,0 +1,29 @@
+/**
+   * 					郑州商品交易所历史行情下载(2010)
+        交易日期0	|品种月份1	|昨结算2	|今开盘3	|最高价4	|最低价5	|今收盘6	|今结算7	|涨跌1 8	|
+        涨跌2 9	|成交量(手)10|空盘量11	|增减量12	|成交额(万元)13	|交割结算价14	|
+*/
+CREATE TABLE czce
+(id varchar(50) PRIMARY KEY, 
+ record_date number(8),
+ secuid VARCHAR(20),
+ exchange varchar(20),
+ product varchar(10),
+ presettle number(14,4),
+ open number(14,4),
+ high number(14,4),
+ low number(14,4),
+ close number(14,4),
+ settle number(14,4),
+ zd1 number(14,4),
+ zd2 number(14,4),
+ cjss number(14,4),
+ kpl number(14,4),
+ zjl number(14,4),
+ cje number(14,4),
+ jgjsj number(14,4),
+ import_time timestamp
+ );
+ --
+insert into CZCE(id,record_date,secuid,exchange,product,presettle,open,high,low,close,settle,zd1,zd2,cjss,kpl,zjl,cje,jgjsj,import_time)  
+values('1',20160331,'A1605','CZCE','A',1,1,1,1,1,1,1,1,1,1,1,1,1,sysdate);

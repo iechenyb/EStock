@@ -1,0 +1,4 @@
+
+create table ticket(id int ,num int);
+select * from ticket where id='1'
+insert into ticket values (1,10)

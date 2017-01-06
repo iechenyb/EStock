@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	   		http://www.springframework.org/schema/context
+	   		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+			http://www.springframework.org/schema/mvc
+			http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+			http://www.springframework.org/schema/task
+			http://www.springframework.org/schema/task/spring-task-3.1.xsd
+			http://www.springframework.org/schema/aop
+			http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+			">
+	<bean id="qqMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">    
+	    <property name="host" value="smtp.qq.com" />    
+	    <property name="port" value="25" />    
+	    <property name="username" value="383065059@qq.com" />    
+	    <property name="password" value="198906013019" />    
+	    <property name="javaMailProperties">    
+	        <props>  
+	            <prop key="mail.smtp.auth">true</prop>    
+	             <!-- 使用默认端口 -->
+               <prop key="mail.smtp.starttls.enable">true</prop>   
+               <!-- 设置超时 -->
+               <prop key="mail.smtp.timeout">25000</prop>    
+	        </props>    
+	    </property>    
+	</bean>  
+	<bean id="sinaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">    
+	    <property name="host" value="smtp.sina.com.cn" />    
+	    <property name="port" value="25" />    
+	    <property name="username" value="zzuchenyb@sina.com" />    
+	    <property name="password" value="" />    
+	    <property name="javaMailProperties">    
+	        <props>  
+	           <prop key="mail.smtp.auth">true</prop>    
+               <prop key="mail.smtp.starttls.enable">true</prop>   
+               <prop key="mail.smtp.timeout">25000</prop>    
+	        </props>    
+	    </property>    
+	</bean> 
+	
+	<!-- 
+	163邮箱  
+　 POP3服务器：pop3.163.com  
+　 SMTP服务器：smtp.163.com  
+Yahoo邮箱  
+   POP3服务器：pop.mail.yahoo.com.cn  
+   SMTP服务器：smtp.mail.yahoo.com  
+搜狐邮箱  
+　 POP3服务器：pop3.sohu.com   
+　 SMTP服务器：smtp.sohu.com  
+新浪邮箱  
+　 POP3服务器：pop.sina.com.cn 或pop3.sina.com.cn   
+　 SMTP服务器：smtp.sina.com.cn  
+     请选择smtp服务器要求身份验证选项  
+139邮箱  
+　 POP3服务器：pop3.139.com   
+　 SMTP服务器：smtp.139.com  
+Gmail邮箱  
+    POP3服务器：pop.gmail.com  端口:995  开启ssl  
+    SMTP服务器：smtp.gmail.com  端口:465 或者587  开启ssl  
+    帐号即用户名，密码相同，邮件地址为username@gmail.com  
+QQ邮箱  
+　 POP3服务器：pop.qq.com   
+　 SMTP服务器：smtp.qq.com  
+   SMTP服务器需要身份验证
+	 -->
+</beans>

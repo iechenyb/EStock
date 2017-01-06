@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"   
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:context="http://www.springframework.org/schema/context"   
+    xmlns:aop="http://www.springframework.org/schema/aop"   
+    xmlns:tx="http://www.springframework.org/schema/tx"   
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd   
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd   
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd   
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">  
+  
+    <description>springJTA</description>  
+    <bean class="com.atomikos.jdbc.AtomikosDataSourceBean" init-method="init" destroy-method="close" id="mysqlds1">  
+        <!-- Set unique name for this DataSource -->    
+        <property name="uniqueResourceName"><value>mysql1</value></property>  
+        <!-- Set XADatasource class name -->    
+        <property name="xaDataSourceClassName" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" />  
+       <!--  <property name="xaDataSourceClassName" value="oracle.jdbc.xa.client.OracleXADataSource" /> -->  
+        <property name="xaProperties">  
+            <props>  
+                <prop key="user">${jdbc1.username}</prop>  
+                <prop key="password">${jdbc1.password}</prop>  
+                <prop key="URL">${jdbc1.url}</prop>  
+            </props>  
+        </property>   
+        <!-- set properties for datasource connection pool -->    
+        <property name="poolSize" value="3" />  
+        <!-- timeout after 20000 seconds -->  
+        <property name="reapTimeout"><value>20000</value></property>    
+    </bean>  
+      
+    <bean id="sessionFactory01"  
+        class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">  
+        <property name="dataSource" ref="mysqlds1" />  
+        <property name="packagesToScan">  
+            <list>  
+                <value>com.multi.datasource</value>  
+            </list>  
+        </property>  
+        <property name="hibernateProperties">  
+            <props>  
+                <prop key="hibernate.dialect">  
+                     org.hibernate.dialect.MySQLDialect
+                </prop>  
+                <prop key="hibernate.show_sql">true</prop>  
+                <prop key="hibernate.current_session_context_class">jta</prop>  
+                <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>  
+            </props>  
+        </property>  
+    </bean>  
+  
+    <bean class="com.atomikos.jdbc.AtomikosDataSourceBean" init-method="init" destroy-method="close" id="mysqlds2">  
+        <!-- Set unique name for this DataSource -->    
+        <property name="uniqueResourceName"><value>mysql2</value></property>  
+        <!-- Set XADatasource class name -->  
+        <property name="xaDataSourceClassName" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" />  
+        <property name="xaProperties">  
+            <props>  
+                <prop key="user">${jdbc2.username}</prop>  
+                <prop key="password">${jdbc2.password}</prop>  
+                <prop key="URL">${jdbc2.url}</prop>  
+            </props>  
+        </property>   
+        <!-- set properties for datasource connection pool -->    
+        <property name="poolSize" value="3" />  
+        <property name="reapTimeout"><value>20000</value></property>    
+    </bean>  
+  
+    <bean id="sessionFactory02"  
+        class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">  
+        <property name="dataSource" ref="mysqlds2" />  
+        <property name="packagesToScan">  
+            <list>  
+                <value>com.multi.datasource</value>  
+            </list>  
+        </property>  
+        <property name="hibernateProperties">  
+            <props>  
+                <prop key="hibernate.dialect">  
+                    org.hibernate.dialect.MySQLDialect  
+                </prop>  
+                <prop key="hibernate.show_sql">true</prop>  
+                <prop key="hibernate.current_session_context_class">jta</prop>  
+                <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>  
+            </props>  
+        </property>  
+    </bean> 
+    
+    <bean class="com.atomikos.jdbc.AtomikosDataSourceBean" init-method="init" destroy-method="close" id="mysqlds3">  
+        <!-- Set unique name for this DataSource -->    
+        <property name="uniqueResourceName"><value>mysql3</value></property>  
+        <!-- Set XADatasource class name -->  
+        <property name="xaDataSourceClassName" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" />  
+        <property name="xaProperties">  
+            <props>  
+                <prop key="user">${jdbc3.username}</prop>  
+                <prop key="password">${jdbc3.password}</prop>  
+                <prop key="URL">${jdbc3.url}</prop>  
+            </props>  
+        </property>   
+        <!-- set properties for datasource connection pool -->    
+        <property name="poolSize" value="3" />  
+        <property name="reapTimeout"><value>20000</value></property>    
+    </bean>  
+      
+     <bean id="sessionFactory03"  
+        class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">  
+        <property name="dataSource" ref="mysqlds3" />  
+        <property name="packagesToScan">  
+            <list>  
+                <value>com.multi.datasource</value>  
+            </list>  
+        </property>  
+        <property name="hibernateProperties">  
+            <props>  
+                <prop key="hibernate.dialect">  
+                    org.hibernate.dialect.MySQLDialect  
+                </prop>  
+                <prop key="hibernate.show_sql">true</prop>  
+                <prop key="hibernate.current_session_context_class">jta</prop>  
+                <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>  
+            </props>  
+        </property>  
+    </bean> 
+    
+    <!-- ds1 ds2 同一个数据库同一张表   ds2,ds3不同数据库的表 -->
+    
+    <bean id="userServiceImpl" class="com.multi.datasource.UserServiceImpl"/>  
+    <!-- mysqlDAO -->  
+    <bean id="mysqlDao1" class="com.multi.datasource.UserMysqlDao1Impl">  
+      <property name="sessionFactory" ref="sessionFactory01"></property>  
+    </bean>  
+    <bean id="mysqlDao2" class="com.multi.datasource.UserMysqlDao2Impl">  
+     <!--  <property name="sessionFactory" ref="sessionFactory02"></property>   -->
+    </bean>  
+    <bean id="mysqlDao3" class="com.multi.datasource.UserMysqlDao3Impl">  
+      <property name="sessionFactory" ref="sessionFactory03"></property>  
+    </bean>  
+         
+   <bean id="jdbcTemplateMysql1" class="org.springframework.jdbc.core.JdbcTemplate">
+     <property name="dataSource">
+         <ref bean="mysqlds1" />
+     </property>
+  </bean>
+  <bean id="jdbcTemplateMysql2" class="org.springframework.jdbc.core.JdbcTemplate">
+     <property name="dataSource">
+         <ref bean="mysqlds2" />
+     </property>
+  </bean>
+  <bean id="jdbcTemplateMysql3" class="org.springframework.jdbc.core.JdbcTemplate">
+     <property name="dataSource">
+         <ref bean="mysqlds3" />
+     </property>
+  </bean>
+    <!-- atomikos事务管理器 -->  
+    <bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager"   
+        init-method="init" destroy-method="close">  
+        <description>UserTransactionManager</description>    
+        <property name="forceShutdown">  
+            <value>true</value>  
+        </property>  
+    </bean>  
+  
+    <bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.UserTransactionImp">  
+        <property name="transactionTimeout" value="300" />  
+    </bean>  
+          
+    <!-- spring 事务管理器 -->  
+    <bean id="transactionManager"  
+        class="org.springframework.transaction.jta.JtaTransactionManager">  
+        <property name="transactionManager" ref="atomikosTransactionManager"/>  
+        <property name="userTransaction" ref="atomikosUserTransaction" />  
+        <property name="allowCustomIsolationLevels" value="true"/>   
+    </bean>  
+  
+ <aop:config proxy-target-class="true">  
+        <aop:pointcut id="servicePoint"  
+            expression="execution (* com.multi.datasource.*.*(..))" />  
+        <aop:advisor pointcut-ref="servicePoint" id="txAdvisor"  
+            advice-ref="defaultTxAdvice" />  
+  </aop:config>  
+  <!-- REQUIRED、SUPPORTS、MANDATORY、REQUIRES_NEW、NOT_SUPPORTED、NEVER、NESTED 
+  	REQUIRED：支持当前事务，如果当前没有事务，就新建一个事务。这是最常见的选择。 
+	SUPPORTS：支持当前事务，如果当前没有事务，就以非事务方式执行。 
+	MANDATORY：支持当前事务，如果当前没有事务，就抛出异常。 
+	REQUIRES_NEW：新建事务，如果当前存在事务，把当前事务挂起。 
+	NOT_SUPPORTED：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。 
+	NEVER：以非事务方式执行，如果当前存在事务，则抛出异常。 
+	NESTED：支持当前事务，如果当前事务存在，则执行一个嵌套事务，如果当前没有事务，就新建一个事务。 
+  -->
+  <tx:advice id="defaultTxAdvice" transaction-manager="transactionManager">  
+        <tx:attributes>  
+            <tx:method name="find*" read-only="true" />  
+            <tx:method name="get*" read-only="true" />  
+            <tx:method name="query*" read-only="true" />  
+            <tx:method name="load*" read-only="true" />  
+            <tx:method name="add*" propagation="REQUIRED" rollback-for="java.lang.Exception" />  
+            <tx:method name="create*" propagation="REQUIRED"  
+                rollback-for="java.lang.Exception" />  
+            <tx:method name="save*" propagation="REQUIRED"  
+                rollback-for="java.lang.Exception" />  
+            <tx:method name="update*" propagation="REQUIRED"  
+                rollback-for="java.lang.Exception" />  
+            <tx:method name="modify*" propagation="REQUIRED"  
+                rollback-for="java.lang.Exception" />  
+            <tx:method name="delete*" propagation="REQUIRED"  
+                rollback-for="java.lang.Exception" />  
+            <tx:method name="remove*" propagation="REQUIRED"  
+                rollback-for="java.lang.Exception" />  
+            <tx:method name="apply*" propagation="REQUIRED"  
+                rollback-for="java.lang.Exception" />  
+            <tx:method name="handle*" propagation="REQUIRED"  
+                rollback-for="java.lang.Exception" />  
+            <tx:method name="do*" propagation="REQUIRED"  
+                rollback-for="java.lang.Exception" />  
+        </tx:attributes>  
+    </tx:advice>   
+</beans>
+<!-- Spring <aop:advisor />配置错误引起的
+expression="execution(* com.service.*.*(..))";    // 后面两个*,表示service包下的所有类下的所有方法
+错误: warning no match for this type name: com.zrm.service [Xlint:invalidAbsoluteTypeName]
+spring使用
+<aop:config>
+   切入点
+   <aop:pointcut id="gkServicePct" expression="execution(* com.zrm.service.*(..))" />
+   <aop:advisor pointcut-ref="gkServicePct" advice-ref="gkTxAdvice" order="0" />
+</aop:config>
+出现warning no match for this type name: com.zrm.service [Xlint:invalidAbsoluteTypeName]错误
+配置事务时,一定注意expression="execution(* com.zrm.service.*(..))" 应该为
+expression="execution(* com.zrm.service.*.*(..))" ,这样，切点才定位到方法上了。 -->

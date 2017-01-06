@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	   		http://www.springframework.org/schema/context
+	   		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+			http://www.springframework.org/schema/mvc
+			http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+			http://www.springframework.org/schema/task
+			http://www.springframework.org/schema/task/spring-task-3.1.xsd
+			http://www.springframework.org/schema/aop
+			http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+			http://www.springframework.org/schema/util
+			http://www.springframework.org/schema/util/spring-util-3.0.xsd
+			">
+<bean id="mbean0" class="com.cyb.mbean.MyMBean"> </bean>
+<bean id="mbeanExporter" class="org.springframework.jmx.export.MBeanExporter">
+    <property name="beans">
+        <util:map>
+        	<entry key="cybMBean:name=mbean0" value-ref="mbean0"></entry>
+        </util:map>
+    </property>
+</bean>
+<bean id='rmiRegistry' class="org.springframework.remoting.rmi.RmiRegistryFactoryBean"></bean>
+<bean id="connectorServer" class="org.springframework.jmx.support.ConnectorServerFactoryBean" depends-on="rmiRegistry">	
+<property name="serviceUrl" value="service:jmx:rmi://localhost/jndi/rmi:localhost:1099/mbean0"></property>    
+</bean>
+</beans>

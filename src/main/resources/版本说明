@@ -1,0 +1,10 @@
+BackServer    
+1.0  websocket+h2
+1.1 soketio+h2
+1.2 activemq+socketio+h2
+1.3 h2+soketio+activemq(前后台分离)
+1.4 redis+soketio+h2(前后台分离)
+Estock
+1.0 websocket
+1.1 sokcketio
+1.2 sokcketio(前后台分离)
