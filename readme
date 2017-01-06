@@ -1,0 +1,4 @@
+ 和1.2的区别，使用了spring4.*和hibernate4.*
+ 添加了分布式事务处理
+hibernate一级缓存
+多数据源jndi的使用
